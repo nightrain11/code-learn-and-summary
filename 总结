@@ -1,0 +1,40 @@
+一，默认值必须从右向左进行设定，在进行参数输入时可以不用输入。
+二，compare
+1.std::string 我们经常用来存储字符串数据, 当然它也可以作为byte的存储器,存储任意字节.
+
+2.通常情况下我们使用 std::string 的 compare 方法比较字符串, 但这个方法比较奥字符串是不可靠的.
+1.compare 方法和 strcmp并不相同, 它比较的是 std::string size()大小里的所有字节.在size() 长度范围里, 如果有’\0’字符, 一样进行比较, 所有在不知道 std::string里是否存储纯字符串时, 最好先转换为 const char* (调用c_str()), 再调用 strcmp比较. 这个坑还是很吓人的
+#include <string>
+#include <iostream>
+#include <string.h>
+
+int main(int argc, char const *argv[]){
+    std::string str("hello");
+    str.append(1,'\0');
+    str.append(1,'i');
+
+    std::cout << str.size() << std::endl;
+    std::cout << str << std::endl;
+    std::cout << str.compare("hello") << std::endl;
+    std::cout << strcmp(str.c_str(),"hello") << std::endl;
+
+
+    return 0;
+}
+输出
+$ ./test-string.exe
+7
+hello
+2
+0
+
+三，find
+   以下所讲的所有的string查找函数，都有唯一的返回类型，那就是size_type，即一个无符号整数（按打印出来的算）。若查找成功，返回按查找规则找到的第一个字符或子串的位置；若查找失败，返回npos，即-1（打印出来为4294967295）。
+//string (1)
+size_type find (const basic_string& str, size_type pos = 0) const noexcept;
+//c-string (2)
+size_type find (const charT* s, size_type pos = 0) const;
+//buffer (3)
+size_type find (const charT* s, size_type pos, size_type n) const;
+//character (4)
+size_type find (charT c, size_type pos = 0) const noexcept;
