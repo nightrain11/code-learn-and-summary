@@ -1,0 +1,365 @@
+Ubuntu16.04安装pcl，方法是直接执行
+
+sudo apt-get install libpcl-dev pcl-tools
+
+
+运行测试程序时出现以下错误
+
+make[2]: *** No rule to make target '/usr/lib/x86_64-linux-gnu/libproj.so', needed by 'joinMap'.  Stop.
+CMakeFiles/Makefile2:67: recipe for target 'CMakeFiles/joinMap.dir/all' failed
+make[1]: *** [CMakeFiles/joinMap.dir/all] Error 2
+Makefile:83: recipe for target 'all' failed
+make: *** [all] Error 2
+
+*** Failure: Exit code 2 ***
+
+解决方法，执行
+
+sudo apt-get install libproj-dev
+
+
+再次编译出现以下错误
+
+-- Build files have been written to: /home/wd/code/slambook-master/ch5/joinMap/build
+[ 50%] Linking CXX executable joinMap
+/usr/bin/ld: cannot find -lvtkproj4
+collect2: error: ld returned 1 exit status
+CMakeFiles/joinMap.dir/build.make:349: recipe for target 'joinMap' failed
+make[2]: *** [joinMap] Error 1
+CMakeFiles/Makefile2:67: recipe for target 'CMakeFiles/joinMap.dir/all' failed
+make[1]: *** [CMakeFiles/joinMap.dir/all] Error 2
+Makefile:83: recipe for target 'all' failed
+make: *** [all] Error 2
+*** Failure: Exit code 2 ***
+
+解决方法，需要在cmakelist中加一条指令修复，即在add_executable语句前面加上list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
+------------------------------------------------------------------------------------------------
+入门linux的同志，刚开始最迫切想知道的，大概一个是中文输入法，另一个就是怎么安装软件。本文主要讲一下LINUX安装软件方面的特点。
+在windows下安装软件，我们只需要有EXE文件，然后双击，下一步直接OK就可以了。但在LINUX下，不是这样的。每个LINUX的发行版，比如UBUNTU，都会维护一个自己的软件仓库，我们常用的几乎所有软件都在这里面。这里面的软件绝对安全，而且绝对的能正常安装。
+那我们要怎么安装呢？在UBUNTU下，我们维护一个源列表，源列表里面都是一些网址信息，这每一条网址就是一个源，这个地址指向的数据标识着这台源服务器上有哪些软件可以安装使用。
+编辑源命令：sudo gedit /etc/apt/sources.list
+在这个文件里加入或者注释（加#）掉一些源后，保存。这时候，我们的源列表里指向的软件就会增加或减少一部分。
+接一下要做的就是：sudo apt-get update
+这个命令，会访问源列表里的每个网址，并读取软件列表，然后保存在本地电脑。我们在新立得软件包管理器里看到的软件列表，都是通过update命令更新的。
+
+update后，可能需要upgrade一下。sudo apt-get upgrade
+这个命令，会把本地已安装的软件，与刚下载的软件列表里对应软件进行对比，如果发现已安装的软件版本太低，就会提示你更新。
+--------------------------------------------------------------------------------------------------------
+执行可执行文件：./之所以这么写，是因为 linux 环境下也有和 windows 类似的 PATH 概念，即如果你只输入文件名，系统会按照PATH变量指定的文件夹下去查找同名文件来执行，./ 就限定了不使用 PATH ，仅仅执行当前路径下的 test.bin 。
+. 代表此层目录
+.. 代表上一层目录
+- 代表前一个工作目录
+~ 代表[目前用户身份]所在的家目录
+执行cmake命令时，进入build并cmake..   //..代表的是父文件夹
+tldr+命令 可以查询命令
+--------------------------------------------------------------------------------------------------
+软件安装卸载，分几种情况：
+一、第一种：deb包，这种软件包就像windows的EXE安装文件一样，各种文件已经编译好，并打了包，哪个文件该放到哪个文件夹，都指定好了，安装非常方便，在图形界面里你只需要双击就能自动安装。
+第二种：rpm包
+1)将目录切换到软件所在的目录
+2)在控制台输入：rpm -ivh qq.rpm ====qq.rpm===是软件的全称
+二、tar.gz（bz或bz2等）结尾的源代码包，这种软件包里面都是源程序，没有编译过，需要编译后才能安装，安装方法为:
+1、打开一个SHELL，即终端
+2、用CD 命令进入源代码压缩包所在的目录
+3、根据压缩包类型解压缩文件(*代表压缩包名称)
+tar -zxvf ****.tar.gz
+tar -jxvf ****.tar.bz(或bz2)
+4、用CD命令进入解压缩后的目录
+5、输入编译文件命令：./configure（有的压缩包已经编译过，这一步可以省去）
+6、然后是命令：make
+7、再是安装文件命令：make install
+8、安装完毕
+三、以bin结尾的安装包，这种包类似于RPM包，安装也比较简单
+1、打开一个SHELL，即终端
+2、用CD 命令进入源代码压缩包所在的目录
+3、给文件加上可执行属性：chmod +x ******.bin（中间是字母x，小写）
+3、执行命令：./******.bin(realplayer for Linux就是这样的安装包)
+------------------------------------------------------------------------
+./configure是源代码安装的第一步，主要的作用是对即将安装的软件进行配置，检查当前的环境是否满足要安装软件的依赖关系，但并不是所有的tar包都是源代码的包，可以ls看看有没有configure这个文件，也许你下的是二进制的包，如果是二进制的包，解压后直接就能使用
+------------------------------------------------------------------------------------------------
+文件/目录权限设置命令：chmod
+其语法格式为：chmod [who] [opt] [mode] 文件/目录名 
+
+其中who表示对象，是以下字母中的一个或组合： 
+
+u：表示文件所有者 
+g：表示同组用户 
+o：表示其它用户 
+a：表示所有用户 
+opt则是代表操作，可以为： 
++：添加某个权限 
+-：取消某个权限 
+=：赋予给定的权限，并取消原有的权限 
+而mode则代表权限： 
+r：可读 
+w：可写 
+x：可执行 
+
+例如：为同组用户增加对文件a.txt的读写权限： 
+
+chmod g+rw a.txt 
+--------------------------------------------------------------------------------------------------
+npm 模块安装机制（只要一行命令，就能安装别人写好的模块）
+一，npm install 命令用来安装模块到node_modules目录。
+
+	npm install <packageName>
+
+安装之前，npm install会先检查，node_modules目录之中是否已经存在指定模块。如果存在，就不再重新安装了，即使远程仓库已经有了一个新版本，也是如此。
+二、npm update
+
+如果想更新已安装模块，就要用到npm update命令。
+
+
+    $ npm update <packageName>
+
+它会先到远程仓库查询最新版本，然后查询本地版本。如果本地版本不存在，或者远程版本较新，就会安装。
+三、模块的安装过程
+
+总结一下，Node模块的安装过程是这样的。
+
+        发出npm install命令
+        npm 向 registry 查询模块压缩包的网址
+        下载压缩包，存放在~/.npm目录
+        解压压缩包到当前项目的node_modules目录
+
+注意，一个模块安装以后，本地其实保存了两份。一份是~/.npm目录下的压缩包，另一份是node_modules目录下解压后的代码。
+
+但是，运行npm install的时候，只会检查node_modules目录，而不会检查~/.npm目录。也就是说，如果一个模块在～/.npm下有压缩包，但是没有安装在node_modules目录中，npm 依然会从远程仓库下载一次新的压缩包。
+--------------------------------------------
+以查找和删除mp3为扩展的文件为例：
+find / -name "*.mp3" |xargs rm -rf
+会删除所有以mp3为扩展的文件。操作的时候先：
+find / -name "*.mp3"
+会打印出匹配的文件，如果觉得正是想删除这些文件，再执行：
+find / -name "*.mp3" |xargs rm -rf
+---------------------------------------------------
+wget -c http://www.minjieren.com/wordpress-3.1-zh_CN.zip
+----------------------------------------
+git
+
+pwd命令用于显示当前目录
+###创建版本库
+初始化一个Git仓库，使用git init命令。
+
+添加文件到Git仓库，分两步：
+
+    第一步，使用命令git add <file>，注意，可反复多次使用，添加多个文件；
+
+    第二步，使用命令git commit，完成。
+
+###版本回退
+
+    HEAD指向的版本就是当前版本，因此，Git允许我们在版本的历史之间穿梭，使用命令git reset --hard commit_id。
+
+    穿梭前，用git log可以查看提交历史，以便确定要回退到哪个版本。
+
+    要重返未来，用git reflog查看命令历史，以便确定要回到未来的哪个版本。
+
+
+    要随时掌握工作区的状态，使用git status命令。
+
+    如果git status告诉你有文件被修改过，用git diff+文件名可以查看修改内容。
+git diff HEAD -- readme.txt命令可以查看工作区和版本库里面最新版本的区别：
+
+
+
+###工作区和暂存区
+你在电脑里能看到的目录，比如我的learngit文件夹就是一个工作区：
+版本库（Repository）
+
+工作区有一个隐藏目录.git，这个不算工作区，而是Git的版本库。
+
+Git的版本库里存了很多东西，其中最重要的就是称为stage（或者叫index）的暂存区，还有Git为我们自动创建的第一个分支master，以及指向master的一个指针叫HEAD。
+###撤销修改
+场景1：当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令git checkout -- file。
+
+场景2：当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令git reset HEAD file，就回到了场景1，第二步按场景1操作。
+
+场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退一节，不过前提是没有推送到远程库。
+###删除文件
+rm test.txt
+Git知道你删除了文件，因此，工作区和版本库就不一致了，git status命令会立刻告诉你哪些文件被删除了
+有两个选择，一是确实要从版本库中删除该文件，那就用命令git rm删掉，并且git commit：
+另一种情况是删错了，因为版本库里还有呢，所以可以很轻松地把误删的文件恢复到最新版本：
+git checkout -- test.txt
+###远程仓库
+本地Git仓库和GitHub仓库之间的传输是通过SSH加密的
+第1步：创建SSH Key。在用户主目录下，看看有没有.ssh目录，如果有，再看看这个目录下有没有id_rsa和id_rsa.pub这两个文件，如果已经有了，可直接跳到下一步。如果没有，打开Shell（Windows下打开Git Bash），创建SSH Key：
+
+$ ssh-keygen -t rsa -C "youremail@example.com"
+你需要把邮件地址换成你自己的邮件地址，然后一路回车，使用默认值即可，由于这个Key也不是用于军事目的，所以也无需设置密码。
+
+如果一切顺利的话，可以在用户主目录里找到.ssh目录，里面有id_rsa和id_rsa.pub两个文件，这两个就是SSH Key的秘钥对，id_rsa是私钥，不能泄露出去，id_rsa.pub是公钥，可以放心地告诉任何人。
+
+第2步：登陆GitHub，打开“Account settings”，“SSH Keys”页面：
+
+然后，点“Add SSH Key”，填上任意Title，在Key文本框里粘贴id_rsa.pub文件的内容：
+为什么GitHub需要SSH Key呢？因为GitHub需要识别出你推送的提交确实是你推送的，而不是别人冒充的，而Git支持SSH协议，所以，GitHub只要知道了你的公钥，就可以确认只有你自己才能推送。
+###添加远程库
+要关联一个远程库，使用命令git remote add origin git@server-name:path/repo-name.git；
+
+关联后，使用命令git push -u origin master第一次推送master分支的所有内容；
+
+此后，每次本地提交后，只要有必要，就可以使用命令git push origin master推送最新修改；
+###从远程库克隆
+ git clone git@github.com:michaelliao/gitskills.git
+GitHub给出的地址不止一个，还可以用https://github.com/michaelliao/gitskills.git这样的地址。实际上，Git支持多种协议，默认的git://使用ssh，但也可以使用https等其他协议。
+
+使用https除了速度慢以外，还有个最大的麻烦是每次推送都必须输入口令，但是在某些只开放http端口的公司内部就无法使用ssh协议而只能用https。
+要克隆一个仓库，首先必须知道仓库的地址，然后使用git clone命令克隆。
+
+Git支持多种协议，包括https，但通过ssh支持的原生git协议速度最快。
+
+###创建与合并分支
+查看分支：git branch
+
+创建分支：git branch <name>
+
+切换分支：git checkout <name>
+
+创建+切换分支：git checkout -b <name>
+
+合并某分支到当前分支：git merge <name>
+
+删除分支：git branch -d <name>
+###分支管理策略
+通常，合并分支时，如果可能，Git会用Fast forward模式，但这种模式下，删除分支后，会丢掉分支信息。
+
+如果要强制禁用Fast forward模式，Git就会在merge时生成一个新的commit，这样，从分支历史上就可以看出分支信息。
+git merge --no-ff -m "merge with no-ff" dev
+因为本次合并要创建一个新的commit，所以加上-m参数，把commit描述写进去。
+
+合并后，我们用git log看看分支历史
+git log --graph --pretty=oneline --abbrev-commit
+分支策略
+
+在实际开发中，我们应该按照几个基本原则进行分支管理：
+
+首先，master分支应该是非常稳定的，也就是仅用来发布新版本，平时不能在上面干活；
+
+那在哪干活呢？干活都在dev分支上，也就是说，dev分支是不稳定的，到某个时候，比如1.0版本发布时，再把dev分支合并到master上，在master分支发布1.0版本；
+
+你和你的小伙伴们每个人都在dev分支上干活，每个人都有自己的分支，时不时地往dev分支上合并就可以了
+合并分支时，加上--no-ff参数就可以用普通模式合并，合并后的历史有分支，能看出来曾经做过合并，而fast forward合并就看不出来曾经做过合并。
+###Bug分支
+修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除；
+
+当手头工作没有完成时，先把工作现场git stash一下，然后去修复bug，修复后，再git stash pop，回到工作现场。
+###Feature分支
+开发一个新feature，最好新建一个分支；
+
+如果要丢弃一个没有被合并过的分支，可以通过git branch -D <name>强行删除。
+###多人协作
+要在dev分支上开发，就必须创建远程origin的dev分支到本地，于是他用这个命令创建本地dev分支：
+
+$ git checkout -b dev origin/dev
+
+
+    查看远程库信息，使用git remote -v；
+
+    本地新建的分支如果不推送到远程，对其他人就是不可见的；
+
+    从本地推送分支，使用git push origin branch-name，如果推送失败，先用git pull抓取远程的新提交；
+
+    在本地创建和远程分支对应的分支，使用git checkout -b branch-name origin/branch-name，本地和远程分支的名称最好一致；
+
+    建立本地分支和远程分支的关联，使用git branch --set-upstream branch-name origin/branch-name；
+
+    从远程抓取分支，使用git pull，如果有冲突，要先处理冲突。
+
+###创建标签
+    命令git tag <name>用于新建一个标签，默认为HEAD，也可以指定一个commit id；
+
+    git tag -a <tagname> -m "blablabla..."可以指定标签信息；
+
+    git tag -s <tagname> -m "blablabla..."可以用PGP签名标签；
+
+    命令git tag可以查看所有标签。
+###删除标签
+
+
+    命令git push origin <tagname>可以推送一个本地标签；
+
+    命令git push origin --tags可以推送全部未推送过的本地标签；
+
+    命令git tag -d <tagname>可以删除一个本地标签；
+
+    命令git push origin :refs/tags/<tagname>可以删除一个远程标签。
+###添加多个远程库
+
+先删除已关联的名为origin的远程库：
+
+git remote rm origin
+然后，先关联GitHub的远程库：
+
+git remote add github git@github.com:michaelliao/learngit.git
+
+注意，远程库的名称叫github，不叫origin了。
+
+接着，再关联码云的远程库：
+
+git remote add gitee git@gitee.com:liaoxuefeng/learngit.git
+
+同样注意，远程库的名称叫gitee，不叫origin。
+用git remote -v查看远程库信息，可以看到两个远程库：
+
+git remote -v
+gitee    git@gitee.com:liaoxuefeng/learngit.git (fetch)
+gitee    git@gitee.com:liaoxuefeng/learngit.git (push)
+github    git@github.com:michaelliao/learngit.git (fetch)
+github    git@github.com:michaelliao/learngit.git (push)
+如果要推送到GitHub，使用命令：
+
+git push github master
+
+如果要推送到码云，使用命令：
+
+git push gitee master
+
+###忽略特殊文件
+.gitignore文件
+
+# Windows:
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Python:
+*.py[cod]
+*.so
+*.egg
+*.egg-info
+dist
+build
+
+# My configurations:
+db.ini
+deploy_key_rsa
+
+
+    忽略某些文件时，需要编写.gitignore；
+
+    .gitignore文件本身要放到版本库里，并且可以对.gitignore做版本管理！
+最后一步就是把.gitignore也提交到Git
+可能是.gitignore写得有问题，需要找出来到底哪个规则写错了，可以用git check-ignore命令检查：
+
+$ git check-ignore -v App.class
+
+
+
+-----------------------------------------------------------------
+tree -L 1 //Show files and directories up to 'num' levels of depth (where 1 means the current directory):
+
+ln命令
+将目录/usr/mengqc/mub1下的文件m2.c链接到目录/usr/liu下的文件a2.c 
+cd /usr/mengqc 
+ln /mub1/m2.c /usr/liu/a2.c
+在目录/usr/liu下建立一个符号链接文件abc，使它指向目录/usr/mengqc/mub1 
+ln -s /usr/mengqc/mub1 /usr/liu/abc
+
+-----------------------------------------------------------------
+/usr/lib/其中，开头的/指的是根目录，如果要说明是目录，则必须为目录名+/  如：usr/否则指代的是文件，如/usr/lib指的是usr目录下的lib文件，而不是lib目录。
+
+
+
+
