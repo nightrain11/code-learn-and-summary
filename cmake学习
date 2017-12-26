@@ -1,0 +1,9 @@
+支持 gdb
+
+让 CMake 支持 gdb 的设置也很容易，只需要指定 Debug 模式下开启 -g 选项：
+set(CMAKE_BUILD_TYPE "Debug")
+set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
+set(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+
+之后可以直接对生成的程序使用 gdb 来调试。
+
